@@ -10,10 +10,9 @@ import SwiftData
 
 @main
 struct Gen_FinanceApp: App {
+
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
+        let schema = Schema([])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
@@ -25,7 +24,9 @@ struct Gen_FinanceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ZStack {
+                ContentView()
+            }
         }
         .modelContainer(sharedModelContainer)
     }

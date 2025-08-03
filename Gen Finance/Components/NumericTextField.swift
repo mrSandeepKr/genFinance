@@ -28,19 +28,22 @@ struct NumericTextField: View {
                     .foregroundColor(Color.primary)
             }
             TextField(placeholder, text: $formattedContent)
+                .focused($isFocused)
                 .font(.system(size: 18, weight: .medium, design: .monospaced))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(.systemGray6))
+                        .fill(isFocused ? Color(.systemGray6).opacity(0.9) : Color(.systemGray6).opacity(0.4))
+                        .animation(.easeInOut(duration: 0.2), value: isFocused)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.blue.opacity(0.2), lineWidth: 1)
-                )
-                .keyboardType(.numberPad)
-                .shadow(color: Color.black.opacity(0.07), radius: 3, x: 0, y: 2)
+                        .stroke( Color.blue.opacity(0.2), lineWidth: 1.5)
+                        .animation(.easeInOut(duration: 0.2), value: isFocused)
+                )                .keyboardType(.numberPad)
+                .shadow(color: isFocused ? Color.blue.opacity(0.1) : Color.black.opacity(0.07),
+                        radius: isFocused ? 6 : 3, x: 0, y: 2)
                 .onChange(of: formattedContent) { _, newVal in
                     currentVal = newVal.filter { "0123456789".contains($0) }
                     formattedContent = currentVal.formattedInINR
@@ -58,6 +61,8 @@ struct NumericTextField: View {
     private let title: String?
     @State private var formattedContent: String
     @Binding private var currentVal: String
+    @FocusState private var isFocused: Bool
+
 }
 
 extension Formatter {

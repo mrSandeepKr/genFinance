@@ -11,72 +11,64 @@ struct FireCalculatorView: View {
     @State private var showResult: Bool = false
 
     var body: some View {
-        Form {
-            Section(header: Text("Current Status")
-                .font(.headline)
-                .foregroundStyle(.indigo.gradient.opacity(0.8))
-            ) {
-                NumericTextField(placeholder: "INR",
-                                 title: "Current Savings",
-                                 currentVal: $currentSavings)
+        ZStack {
+            Form {
+                FormSection(heading: "Current Status") {
+                    NumericTextField(placeholder: "INR",
+                                     title: "Current Savings",
+                                     currentVal: $currentSavings)
+                    
+                    NumericTextField(placeholder: "INR",
+                                     title: "Current Salary",
+                                     currentVal: $currentSalary)
+                }
                 
-                NumericTextField(placeholder: "INR",
-                                 title: "Current Salary",
-                                 currentVal: $currentSalary)
-            }
-            .listRowInsets(.init())
-            
-            Section(header: Text("SIP numbers")) {
-                NumericTextField(placeholder: "INR",
-                                 title: "Monthly SIP Investment",
-                                 currentVal: $monthlySIP)
+                FormSection(heading: "SIP numbers") { 
+                    NumericTextField(placeholder: "INR",
+                                     title: "Monthly SIP Investment",
+                                     currentVal: $monthlySIP)
+                    
+                    Text("Take SIP value as input ?? ")
+                }
                 
-                Text("Take SIP value as input")
-            }
-            .listRowInsets(.init())
-            
-            
-            
-            Section(header: Text("Provident Fund (PF)")) {
-                TextField("PF by Employee (% of salary)", text: $pfEmployeePercent)
-                    .keyboardType(.decimalPad)
-                TextField("PF by Employer (% of salary)", text: $pfEmployerPercent)
-                    .keyboardType(.decimalPad)
-            }
-            .listRowInsets(.init())
-            
-            
-            Section(header: Text("Assumptions")) {
-                TextField("Expected Annual Inflation (%)", text: $inflationPercent)
-                    .keyboardType(.decimalPad)
-            }
-            .listRowInsets(.init())
-            
-            
-            Section {
-                Button("Calculate FIRE Corpus") {
-                    calculateFireCorpus()
+                FormSection(heading: "PF Contribution") {
+                    TextField("PF by Employee (% of salary)", text: $pfEmployeePercent)
+                        .keyboardType(.decimalPad)
+                    TextField("PF by Employer (% of salary)", text: $pfEmployerPercent)
+                        .keyboardType(.decimalPad)
+                }
+                
+                FormSection(heading: "Assumption") {
+                    TextField("Expected Annual Inflation (%)", text: $inflationPercent)
+                        .keyboardType(.decimalPad)
                 }
             }
-            .listRowInsets(.init())
-            
-            if let corpus = fireCorpus, showResult {
-                Section(header: Text("Estimated FIRE Corpus")) {
-                    Text("₹\(corpus, specifier: ".2f")")
-                        .font(.title2)
-                        .foregroundColor(.green)
+            .scrollContentBackground(.hidden)
+            .background(Color.clear)
+            .padding(.bottom, 80)
+
+            VStack {
+                Spacer()
+                Button(action: calculateFireCorpus) {
+                    Text("Calculate FIRE Corpus")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.indigo.gradient.opacity(0.6))
+                        .foregroundColor(.white)
+                        .fontWeight(.semibold)
+                        .font(.system(size: 20))
+                        .cornerRadius(8)
                 }
+                .padding(.init(top: 16, leading: 12, bottom: 8, trailing: 12))
+                .background(
+                    Color(.systemBackground).edgesIgnoringSafeArea(.bottom).shadow(radius: 8)
+                )
             }
+            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
-        .navigationTitle(
-            Text("FIRE Calculator")
-                .foregroundStyle(.green))
-        .scrollContentBackground(.hidden)
-        .background(Color.clear)
-        .onAppear {
-            UITableView.appearance().backgroundColor = .clear
-        }
+        .navigationTitle("FIRE Calculator")
     }
+
 
     func calculateFireCorpus() {
         // Parse inputs

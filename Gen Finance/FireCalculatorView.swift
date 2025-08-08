@@ -9,7 +9,7 @@ struct FireCalculatorView: View {
     @State private var inflationPercent: String = "6"
     @State private var fireCorpus: Double? = nil
     @State private var showResult: Bool = false
-
+    
     var body: some View {
         ZStack {
             Form {
@@ -23,7 +23,7 @@ struct FireCalculatorView: View {
                                      currentVal: $currentSalary)
                 }
                 
-                FormSection(heading: "SIP numbers") { 
+                FormSection(heading: "SIP numbers") {
                     NumericTextField(placeholder: "INR",
                                      title: "Monthly SIP Investment",
                                      currentVal: $monthlySIP)
@@ -32,21 +32,18 @@ struct FireCalculatorView: View {
                 }
                 
                 FormSection(heading: "PF Contribution") {
-                    TextField("PF by Employee (% of salary)", text: $pfEmployeePercent)
-                        .keyboardType(.decimalPad)
-                    TextField("PF by Employer (% of salary)", text: $pfEmployerPercent)
-                        .keyboardType(.decimalPad)
+                    PercentageInputField(value: $pfEmployeePercent, title: "PF by Employee")
+                    PercentageInputField(value: $pfEmployerPercent, title: "PF by Employer")
                 }
                 
-                FormSection(heading: "Assumption") {
-                    TextField("Expected Annual Inflation (%)", text: $inflationPercent)
-                        .keyboardType(.decimalPad)
+                FormSection(heading: "Assumptions") {
+                    PercentageInputField(value: $inflationPercent, title: "Expected Annual Inflation")
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Color.clear)
             .padding(.bottom, 80)
-
+            
             VStack {
                 Spacer()
                 Button(action: calculateFireCorpus) {
@@ -64,12 +61,12 @@ struct FireCalculatorView: View {
                     Color(.systemBackground).edgesIgnoringSafeArea(.bottom).shadow(radius: 8)
                 )
             }
-            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationTitle("FIRE Calculator")
     }
-
-
+    
+    
     func calculateFireCorpus() {
         // Parse inputs
         let savings = Double(currentSavings) ?? 0
@@ -81,7 +78,7 @@ struct FireCalculatorView: View {
         let years = 30.0 // Assume 30 years to FIRE for simplicity
         let annualReturn = 0.12 // Assume 12% annual return on investments
         let swr = 0.04 // 4% safe withdrawal rate
-
+        
         // PF calculation (grows with inflation)
         var pfBalance = 0.0
         var pfSalary = salary
@@ -90,7 +87,7 @@ struct FireCalculatorView: View {
             pfBalance = (pfBalance + yearlyContribution) * (1 + inflation)
             pfSalary *= (1 + inflation)
         }
-
+        
         // SIP calculation (monthly compounding)
         let months = years * 12
         let monthlyReturn = pow(1 + annualReturn, 1/12.0) - 1
@@ -98,7 +95,7 @@ struct FireCalculatorView: View {
         for _ in 0..<Int(months) {
             sipBalance = (sipBalance + sip) * (1 + monthlyReturn)
         }
-
+        
         // Total corpus
         let totalCorpus = savings * pow(1 + annualReturn, years) + pfBalance + sipBalance
         fireCorpus = totalCorpus / swr
@@ -110,4 +107,4 @@ struct FireCalculatorView: View {
     NavigationStack {
         FireCalculatorView()
     }
-} 
+}

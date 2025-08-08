@@ -1,27 +1,37 @@
 import SwiftUI
 
 struct PercentageInputField: View {
-    @Binding var value: String
-    @FocusState private var isFocused: Bool
-    var title: String = "Percentage"
+    
+    // MARK: - Init
 
-    @State private var textWidth: CGFloat = 40
+    init(value: Binding<String>,
+         title: String = "Percentage",
+         focusedField: FocusState<FireCalculatorView.Field?>.Binding,
+         field: FireCalculatorView.Field) {
+        self._value = value
+        self.title = title
+        self.focusedField = focusedField
+        self.field = field
+    }
+    
+    // MARK: - View
 
     var body: some View {
         HStack {
             Text(title)
                 .font(.headline)
                 .foregroundStyle(.secondary)
+            
             Spacer()
-
-            ZStack(alignment: .bottom) {
+            
+            ZStack(alignment: .trailing) {
                 TextField("0", text: $value)
                     .keyboardType(.decimalPad)
-                    .focused($isFocused)
+                    .focused(focusedField, equals: field)
                     .multilineTextAlignment(.trailing)
                     .padding(.bottom, 2)
-                    .animation(.easeInOut(duration: 0.2), value: isFocused)
-                    .foregroundColor(isFocused ? .primary : .secondary)
+                    .animation(.easeInOut(duration: 0.2), value: (focusedField.wrappedValue == field))
+                    .foregroundColor((focusedField.wrappedValue == field) ? .primary : .secondary)
                     .onChange(of: value) { oldValue, newValue in
                         guard let doubleValue = Double(newValue) else {
                             if newValue == "" {
@@ -70,14 +80,15 @@ struct PercentageInputField: View {
                             })
                     )
                     .font(.system(size: 18, weight: .medium, design: .rounded))
+                    .frame(width: 120)
 
-                HStack {
+                VStack {
                     Spacer()
                     
                     Rectangle()
-                        .frame(width: textWidth, height: isFocused ? 2 : 1)
-                        .foregroundColor(isFocused ? .indigo.opacity(0.5) : .gray.opacity(0.5))
-                        .animation(.easeInOut(duration: 0.2), value: isFocused)
+                        .frame(width: textWidth, height: (focusedField.wrappedValue == field) ? 2 : 1)
+                        .foregroundColor((focusedField.wrappedValue == field) ? .indigo.opacity(0.5) : .gray.opacity(0.5))
+                        .animation(.easeInOut(duration: 0.2), value: (focusedField.wrappedValue == field))
                 }
             }
 
@@ -86,10 +97,19 @@ struct PercentageInputField: View {
                 .font(.system(size: 18, weight: .medium, design: .rounded))
                 .padding(.trailing, 4)
         }
-        .padding(.vertical, 14)
+        .padding(.top, 14)
         .listRowSeparator(.hidden)
         .listRowInsets(.init())
     }
+    
+    // MARK: - Private
+    
+    @Binding private var value: String
+    private let title: String
+    private var focusedField: FocusState<FireCalculatorView.Field?>.Binding
+    private var field: FireCalculatorView.Field?
+   
+    @State private var textWidth: CGFloat = 40
 }
 
 

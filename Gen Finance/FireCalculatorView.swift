@@ -1,48 +1,58 @@
 import SwiftUI
 
 struct FireCalculatorView: View {
-    @State private var currentSavings: String = ""
-    @State private var monthlySIP: String = ""
-    @State private var currentSalary: String = ""
-    @State private var pfEmployeePercent: String = "12"
-    @State private var pfEmployerPercent: String = "12"
-    @State private var inflationPercent: String = "6"
-    @State private var fireCorpus: Double? = nil
-    @State private var showResult: Bool = false
+    
+    // MARK: - View
     
     var body: some View {
         ZStack {
-            Form {
-                FormSection(heading: "Current Status") {
-                    NumericTextField(placeholder: "INR",
-                                     title: "Current Savings",
-                                     currentVal: $currentSavings)
+            ScrollView {
+                VStack(spacing: 0) {
+                    FormSection(heading: "Current Status") {
+                        NumericTextField(placeholder: "INR",
+                                         title: "Current Savings",
+                                         currentVal: $currentSavings,
+                                         focusedField: $focusedField,
+                                         field: .currentSavings)
+                        
+                        NumericTextField(placeholder: "INR",
+                                         title: "Current Salary",
+                                         currentVal: $currentSalary,
+                                         focusedField: $focusedField,
+                                         field: .currentSalary)
+                    }
                     
-                    NumericTextField(placeholder: "INR",
-                                     title: "Current Salary",
-                                     currentVal: $currentSalary)
-                }
-                
-                FormSection(heading: "SIP numbers") {
-                    NumericTextField(placeholder: "INR",
-                                     title: "Monthly SIP Investment",
-                                     currentVal: $monthlySIP)
+                    FormSection(heading: "SIP numbers") {
+                        NumericTextField(placeholder: "INR",
+                                         title: "Monthly SIP Investment",
+                                         currentVal: $monthlySIP,
+                                         focusedField: $focusedField,
+                                         field: .monthlySIP)
+                    }
                     
-                    Text("Take SIP value as input ?? ")
-                }
-                
-                FormSection(heading: "PF Contribution") {
-                    PercentageInputField(value: $pfEmployeePercent, title: "PF by Employee")
-                    PercentageInputField(value: $pfEmployerPercent, title: "PF by Employer")
-                }
-                
-                FormSection(heading: "Assumptions") {
-                    PercentageInputField(value: $inflationPercent, title: "Expected Annual Inflation")
+                    FormSection(heading: "PF Contribution") {
+                        PercentageInputField(value: $pfEmployeePercent,
+                                             title: "PF by Employee",
+                                             focusedField: $focusedField,
+                                             field: .pfEmployeePercent)
+                        PercentageInputField(value: $pfEmployerPercent,
+                                             title: "PF by Employer",
+                                             focusedField: $focusedField,
+                                             field: .pfEmployerPercent)
+                    }
+                    
+                    FormSection(heading: "Assumptions") {
+                        PercentageInputField(value: $inflationPercent,
+                                             title: "Expected Annual Inflation",
+                                             focusedField: $focusedField,
+                                             field: .inflationPercent)
+                    }
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Color.clear)
-            .padding(.bottom, 80)
+            .padding(.horizontal, 15)
+            .padding(.bottom, keyboard.isKeyboardVisible ? 0 : 80)
             
             VStack {
                 Spacer()
@@ -61,10 +71,36 @@ struct FireCalculatorView: View {
                     Color(.systemBackground).edgesIgnoringSafeArea(.bottom).shadow(radius: 8)
                 )
             }
+            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationTitle("FIRE Calculator")
+        .onTapGesture {
+            focusedField = nil
+        }
     }
+    
+    enum Field: Hashable {
+        case currentSavings
+        case currentSalary
+        case monthlySIP
+        case pfEmployeePercent
+        case pfEmployerPercent
+        case inflationPercent
+    }
+    
+    // MARK: - Private
+    
+    @StateObject private var keyboard = KeyboardResponder()
+    
+    @State private var currentSavings: String = ""
+    @State private var monthlySIP: String = ""
+    @State private var currentSalary: String = ""
+    @State private var pfEmployeePercent: String = "12"
+    @State private var pfEmployerPercent: String = "12"
+    @State private var inflationPercent: String = "6"
+    @State private var fireCorpus: Double? = nil
+    @State private var showResult: Bool = false
+    @FocusState private var focusedField: Field?
     
     
     func calculateFireCorpus() {

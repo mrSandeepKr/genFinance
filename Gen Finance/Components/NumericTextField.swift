@@ -11,46 +11,48 @@ struct NumericTextField: View {
 
     // MARK: - Init
 
-    init(placeholder: String, title: String? = nil, currentVal: Binding<String>) {
+    init(placeholder: String, title: String, currentVal: Binding<String>, focusedField: FocusState<FireCalculatorView.Field?>.Binding, field: FireCalculatorView.Field) {
         self.placeholder = placeholder
         self.title = title
         self._currentVal = currentVal
         self._formattedContent = State(initialValue: currentVal.wrappedValue.formattedInINR)
+        self.focusedField = focusedField
+        self.field = field
     }
 
     // MARK: - View
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if let title {
+            
                 Text(title)
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundColor(Color.primary)
-            }
+            
             TextField(placeholder, text: $formattedContent)
-                .focused($isFocused)
+                .focused(focusedField, equals: field)
                 .font(.system(size: 18, weight: .medium, design: .monospaced))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(isFocused ? Color(.systemGray6).opacity(0.9) : Color(.systemGray6).opacity(0.4))
-                        .animation(.easeInOut(duration: 0.2), value: isFocused)
+                        .fill(focusedField.wrappedValue == field ? Color(.systemGray6).opacity(0.9) : Color(.systemGray6).opacity(0.4))
+                        .animation(.easeInOut(duration: 0.2), value: focusedField.wrappedValue == field)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke( Color.blue.opacity(0.2), lineWidth: 1.5)
-                        .animation(.easeInOut(duration: 0.2), value: isFocused)
+                        .stroke( Color.indigo.opacity(0.2), lineWidth: 1.5)
+                        .animation(.easeInOut(duration: 0.2), value: focusedField.wrappedValue == field)
                 )                .keyboardType(.numberPad)
-                .shadow(color: isFocused ? Color.blue.opacity(0.1) : Color.black.opacity(0.07),
-                        radius: isFocused ? 6 : 3, x: 0, y: 2)
+                .shadow(color: focusedField.wrappedValue == field ? Color.indigo.opacity(0.1) : Color.black.opacity(0.07),
+                        radius: focusedField.wrappedValue == field ? 6 : 3, x: 0, y: 2)
                 .onChange(of: formattedContent) { _, newVal in
                     currentVal = newVal.filter { "0123456789".contains($0) }
                     formattedContent = currentVal.formattedInINR
                 }
                 .padding(.init(top: 0, leading: 1, bottom: 0, trailing: 1))
         }
-        .padding(.vertical, 10)
+        .padding(.top, 10)
         .listRowInsets(.init())
         .listRowSeparator(.hidden)
     }
@@ -58,14 +60,14 @@ struct NumericTextField: View {
     // MARK: - Private
 
     private let placeholder: String
-    private let title: String?
-    @State private var formattedContent: String
+    private let title: String
     @Binding private var currentVal: String
-    @FocusState private var isFocused: Bool
-
+    @State private var formattedContent: String
+    private var focusedField: FocusState<FireCalculatorView.Field?>.Binding
+    private var field: FireCalculatorView.Field
 }
 
-extension Formatter {
+fileprivate extension Formatter {
     static let inr: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
@@ -76,7 +78,7 @@ extension Formatter {
     }()
 }
 
-extension String {
+fileprivate extension String {
     var formattedInINR: String {
         guard let doubleValue = Double(self) else {
             return self

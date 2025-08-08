@@ -18,13 +18,21 @@ struct FormSection<Content: View>: View {
     }
 
     var body: some View {
-        Section(
-            header: Text(heading)
-                .font(.headline)
-                .foregroundStyle(.indigo.gradient.opacity(0.8))
-        ) {
+        VStack(spacing: 0) {
+            Text(heading)
+                .font(.system(size: 25, weight: .semibold))
+                    .foregroundStyle(.indigo.gradient.opacity(0.8))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 12)
             content
+            Spacer(minLength: 10)
         }
         .listRowInsets(.init())
+    }
+}
+
+#Preview {
+    NavigationStack {
+        FireCalculatorView()
     }
 }

@@ -46,15 +46,12 @@ struct NumericTextField: View {
                 )                .keyboardType(.numberPad)
                 .shadow(color: focusedField.wrappedValue == field ? Color.indigo.opacity(0.1) : Color.black.opacity(0.07),
                         radius: focusedField.wrappedValue == field ? 6 : 3, x: 0, y: 2)
-                .onChange(of: formattedContent) { _, newVal in
-                    currentVal = newVal.filter { "0123456789".contains($0) }
-                    formattedContent = currentVal.formattedInINR
+                .onChange(of: formattedContent) { _, newValue in
+                    onChange(newValue)
                 }
                 .padding(.init(top: 0, leading: 1, bottom: 0, trailing: 1))
         }
         .padding(.top, 10)
-        .listRowInsets(.init())
-        .listRowSeparator(.hidden)
     }
     
     // MARK: - Private
@@ -65,6 +62,11 @@ struct NumericTextField: View {
     @State private var formattedContent: String
     private var focusedField: FocusState<FireCalculatorView.Field?>.Binding
     private var field: FireCalculatorView.Field
+    
+    private func onChange(_ newValue: String) {
+        currentVal = newValue.filter { "0123456789".contains($0) }
+        formattedContent = currentVal.formattedInINR
+    }
 }
 
 fileprivate extension Formatter {

@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 struct FireCalculatorView: View {
     
@@ -8,6 +9,11 @@ struct FireCalculatorView: View {
         ZStack {
             ScrollView {
                 VStack(spacing: 0) {
+                    FormSection(heading: "Preference") {
+                        AgeInputSection(currentAge: $currentAge,
+                                        retirementAge: $retirementAge,
+                                        focusedField: $focusedField)
+                    }
                     FormSection(heading: "Current Status") {
                         NumericTextField(placeholder: "INR",
                                          title: "Current Savings",
@@ -86,6 +92,8 @@ struct FireCalculatorView: View {
         case pfEmployeePercent
         case pfEmployerPercent
         case inflationPercent
+        case currentAge
+        case retirementAge
     }
     
     // MARK: - Private
@@ -101,6 +109,9 @@ struct FireCalculatorView: View {
     @State private var fireCorpus: Double? = nil
     @State private var showResult: Bool = false
     @FocusState private var focusedField: Field?
+    
+    @State private var currentAge: String = "25"
+    @State private var retirementAge: String = "55"
     
     
     func calculateFireCorpus() {

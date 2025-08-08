@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct NumericTextField: View {
-
+    
     // MARK: - Init
-
+    
     init(placeholder: String, title: String, currentVal: Binding<String>, focusedField: FocusState<FireCalculatorView.Field?>.Binding, field: FireCalculatorView.Field) {
         self.placeholder = placeholder
         self.title = title
@@ -19,15 +19,15 @@ struct NumericTextField: View {
         self.focusedField = focusedField
         self.field = field
     }
-
+    
     // MARK: - View
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             
-                Text(title)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundColor(Color.primary)
+            Text(title)
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundColor(Color.primary)
             
             TextField(placeholder, text: $formattedContent)
                 .focused(focusedField, equals: field)
@@ -56,9 +56,9 @@ struct NumericTextField: View {
         .listRowInsets(.init())
         .listRowSeparator(.hidden)
     }
-
+    
     // MARK: - Private
-
+    
     private let placeholder: String
     private let title: String
     @Binding private var currentVal: String

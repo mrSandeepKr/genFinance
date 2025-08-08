@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ToolListView: View {
-   
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -12,7 +12,7 @@ struct ToolListView: View {
                             Image(systemName: "flame.fill")
                                 .symbolRenderingMode(.palette)
                                 .foregroundStyle(.red, .yellow)
-
+                            
                             Text("Fire Calculator")
                         }
                         .padding(.init(top: 10, leading: 1, bottom: 10, trailing: 1))

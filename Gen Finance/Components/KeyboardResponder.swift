@@ -10,7 +10,7 @@ import Combine
 
 final class KeyboardResponder: ObservableObject {
     @Published private(set) var isKeyboardVisible: Bool = false
-
+    
     private var keyboardPublisher: AnyPublisher<Bool, Never> {
         Publishers.Merge(
             NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
@@ -20,9 +20,9 @@ final class KeyboardResponder: ObservableObject {
         )
         .eraseToAnyPublisher()
     }
-
+    
     private var cancellable: AnyCancellable?
-
+    
     init() {
         cancellable = keyboardPublisher
             .receive(on: RunLoop.main)

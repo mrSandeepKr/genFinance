@@ -51,7 +51,7 @@ struct NumericTextField: View {
                 }
                 .padding(.init(top: 0, leading: 1, bottom: 0, trailing: 1))
         }
-        .padding(.top, 10)
+        .padding(.top, 20)
     }
     
     // MARK: - Private
@@ -85,7 +85,6 @@ fileprivate extension String {
         guard let doubleValue = Double(self) else {
             return self
         }
-        print(doubleValue)
         return Formatter.inr.string(from: NSNumber(value: doubleValue)) ?? self
     }
 }

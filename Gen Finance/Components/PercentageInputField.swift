@@ -82,7 +82,7 @@ struct PercentageInputField: View {
                 .font(.system(size: 18, weight: .medium, design: .rounded))
                 .padding(.trailing, 4)
         }
-        .padding(.top, 14)
+        .padding(.top, 20)
     }
 
     // MARK: - Private

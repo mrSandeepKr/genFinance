@@ -95,6 +95,7 @@ struct SingleAgeInput: View {
         VStack(alignment: .center, spacing: 10) {
             TextField(placeholder, text: $value)
                 .focused(focusedField, equals: field)
+                .tint(.indigo)
                 .keyboardType(.numberPad)
                 .font(.system(size: 50, weight: .bold, design: .monospaced))
                 .foregroundStyle(.indigo.gradient.opacity(0.9))

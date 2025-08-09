@@ -28,6 +28,7 @@ struct PercentageInputField: View {
             ZStack(alignment: .trailing) {
                 TextField("0", text: $value)
                     .keyboardType(.decimalPad)
+                    .tint(.indigo)
                     .focused(focusedField, equals: field)
                     .multilineTextAlignment(.trailing)
                     .padding(.bottom, 2)

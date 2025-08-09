@@ -18,6 +18,7 @@ struct ToolListView: View {
                         .padding(.init(top: 10, leading: 1, bottom: 10, trailing: 1))
                     }
                     .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
                     .listRowSeparator(.visible, edges: .bottom)
                 }
                 .scrollContentBackground(.hidden)

@@ -31,6 +31,7 @@ struct NumericTextField: View {
             
             TextField(placeholder, text: $formattedContent)
                 .focused(focusedField, equals: field)
+                .tint(.indigo)
                 .font(.system(size: 18, weight: .medium, design: .monospaced))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)

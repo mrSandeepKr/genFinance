@@ -24,6 +24,11 @@ struct FireCalculatorView: View {
                                          currentVal: $expectedMonthlyExpense,
                                          focusedField: $focusedField,
                                          field: .expectedMonthlyExpense)
+                        
+                        Text("The expected monthly expense at retirement in current value of money.")
+                            .foregroundStyle(.secondary)
+                            .font(.caption)
+                            .offset(y: 5)
                     }
                     .transition(.opacity.combined(with: .move(edge: .top)))
                     .animation(.easeOut(duration: 0.5), value: currentAge)
@@ -33,51 +38,52 @@ struct FireCalculatorView: View {
                                          currentVal: $currentSavings,
                                          focusedField: $focusedField,
                                          field: .currentSavings)
-                        NumericTextField(placeholder: "INR",
-                                         title: "Current Salary (Monthly)",
-                                         currentVal: $currentSalary,
-                                         focusedField: $focusedField,
-                                         field: .currentSalary)
-                    }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                    .animation(.easeOut(duration: 0.5).delay(0.1), value: currentSalary)
-                    FormSection(heading: "SIP numbers", symbol: "chart.line.uptrend.xyaxis") {
-                        NumericTextField(placeholder: "INR",
-                                         title: "Monthly SIP Investment",
-                                         currentVal: $monthlySIP,
-                                         focusedField: $focusedField,
-                                         field: .monthlySIP)
-                        PercentageInputField(value: $expectedYearlyReturn,
-                                             title: "Expected Yearly Return",
-                                             focusedField: $focusedField,
-                                             field: .expectedYearlyReturn)
-                        .offset(y: 10)
-                        PercentageInputField(value: $expectedIncInSIPAmount,
-                                             title: "Expected Inc in SIP",
-                                             focusedField: $focusedField,
-                                             field: .expectedIncInSIPAmount)
-                    }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                    .animation(.easeOut(duration: 0.5).delay(0.2), value: monthlySIP)
-                    FormSection(heading: "PF Contribution", symbol: "building.columns") {
+                        Text("Include all the savings that you have, such as fixed deposits, mutual funds, etc.")
+                            .foregroundStyle(.secondary)
+                            .font(.caption)
+                            .offset(y: 5)
+                        
+                        
                         NumericTextField(placeholder: "INR",
                                          title: "Current PF Balance",
                                          currentVal: $currentPfBalance,
                                          focusedField: $focusedField,
                                          field: .currentPfBalance)
+                        
+                    }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .animation(.easeOut(duration: 0.5).delay(0.1), value: currentSalary)
+                    FormSection(heading: "Investment Plan", symbol: "chart.line.uptrend.xyaxis") {
+                        
+                        NumericTextField(placeholder: "INR",
+                                         title: "Monthly SIP Investment",
+                                         currentVal: $monthlySIP,
+                                         focusedField: $focusedField,
+                                         field: .monthlySIP)
+                        
+                        PercentageInputField(value: $expectedIncInSIPAmount,
+                                             title: "Expected increase in SIP",
+                                             focusedField: $focusedField,
+                                             field: .expectedIncInSIPAmount)
+                        
                         NumericTextField(placeholder: "INR",
                                          title: "PF Monthly Contribution",
                                          currentVal: $currentPfContribution,
                                          focusedField: $focusedField,
                                          field: .currentPfContribution)
-                        Text("This will be increased based on \"Expected Salary Increase\" field ")
+                        Text("This will be increased based on \"Expected Salary Increase\" field and interest would be 8.5% p.a. applied monthly")
                             .foregroundStyle(.secondary)
                             .font(.caption)
                             .offset(y: 5)
                     }
                     .transition(.opacity.combined(with: .move(edge: .top)))
-                    .animation(.easeOut(duration: 0.5).delay(0.3), value: currentPfContribution)
+                    .animation(.easeOut(duration: 0.5).delay(0.2), value: monthlySIP)
+
                     FormSection(heading: "Assumptions", symbol: "lightbulb") {
+                        PercentageInputField(value: $expectedYearlyReturn,
+                                             title: "Expected Yearly Return",
+                                             focusedField: $focusedField,
+                                             field: .expectedYearlyReturn)
                         PercentageInputField(value: $inflationPercent,
                                              title: "Expected Annual Inflation",
                                              focusedField: $focusedField,
@@ -100,32 +106,27 @@ struct FireCalculatorView: View {
             }
             VStack {
                 Spacer()
-                NavigationLink(
-                    destination: FireResultView(requiredCorpus: fireCorpus ?? 0, projectedCorpus: projectedCorpus ?? 0),
-                    isActive: $showResult
-                ) {
-                    Button(action: {
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-                            calculateFireCorpus()
-                        }
-                    }) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.indigo.gradient.opacity(0.7))
-                                .frame(height: 56)
-                                .overlay(
-                                    LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.35), Color.clear]), startPoint: .top, endPoint: .bottom)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                                )
-                                .shadow(color: Color.indigo.opacity(0.18), radius: 8, x: 0, y: 4)
-                            Text("Calculate FIRE Corpus")
-                                .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
-                        }
-                        .scaleEffect(showResult ? 1.05 : 1.0)
-                        .animation(.easeInOut(duration: 0.2), value: showResult)
+                Button(action: {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                        calculateFireCorpus()
                     }
+                }) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.indigo.gradient.opacity(0.7))
+                            .frame(height: 56)
+                            .overlay(
+                                LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.35), Color.clear]), startPoint: .top, endPoint: .bottom)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                            )
+                            .shadow(color: Color.indigo.opacity(0.18), radius: 8, x: 0, y: 4)
+                        Text("Calculate FIRE Corpus")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(.white)
+                            .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
+                    }
+                    .scaleEffect(showResult ? 1.05 : 1.0)
+                    .animation(.easeInOut(duration: 0.2), value: showResult)
                 }
                 .padding(.init(top: 16, leading: 12, bottom: 8, trailing: 12))
                 .background(
@@ -138,6 +139,10 @@ struct FireCalculatorView: View {
         .onTapGesture {
             focusedField = nil
         }
+        .navigationDestination(isPresented: $showResult) {
+            FireResultView(requiredCorpus: fireCorpus ?? 0, projectedCorpus: projectedCorpus ?? 0)
+        }
+        .hideToolBarWithSwipeToDismiss()
     }
     
     enum Field: Hashable {
@@ -174,7 +179,7 @@ struct FireCalculatorView: View {
     @State private var expectedSalaryIncrease: String = "5"
     @State private var currentPfContribution: String = ""
     @State private var currentPfBalance: String = ""
-    @State private var inflationPercent: String = "5"
+    @State private var inflationPercent: String = "8"
     @State private var currentAge: String = "27"
     @State private var retirementAge: String = "45"
     
@@ -218,15 +223,5 @@ struct FireCalculatorView: View {
 #Preview {
     NavigationStack {
         FireCalculatorView()
-    }
-}
-
-struct VisualEffectBlur: UIViewRepresentable {
-    var blurStyle: UIBlurEffect.Style
-    func makeUIView(context: Context) -> UIVisualEffectView {
-        return UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
-    }
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
-        uiView.effect = UIBlurEffect(style: blurStyle)
     }
 }

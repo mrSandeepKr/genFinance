@@ -1,8 +1,11 @@
 import SwiftUI
+import Charts
 
 struct FireResultView: View {
-    let requiredCorpus: Double
-    let projectedCorpus: Double
+    
+    // MARK: - Private
+    
+    let fireCalculationResult: FireCalculationResult
     @Environment(\.dismiss) var dismiss
     @State private var animatedRequired: Double = 0
     @State private var animatedProjected: Double = 0
@@ -10,57 +13,80 @@ struct FireResultView: View {
     @State private var showIcon: Bool = false
     @State private var iconScale: CGFloat = 0.5
     
+    private var projectedCorpus: Double {
+        fireCalculationResult.projectedCorpus
+    }
+    
+    private var requiredCorpus: Double {
+        fireCalculationResult.requiredCorpus
+    }
+    
+    private var yearlyData: [YearlyCorpusPoint] {
+        fireCalculationResult.yearlyData
+    }
+    
+    // MARK: - View
+    
     var body: some View {
         ZStack {
             contentBackground()
-            VStack(spacing: 32) {
-                Spacer(minLength: 20)
-                Image(systemName: "flame.fill")
-                    .font(.system(size: 44))
-                    .foregroundStyle(.indigo, .orange)
-                    .shadow(color: .indigo.opacity(0.15), radius: 12, x: 0, y: 6)
-                    .scaleEffect(iconScale)
-                    .opacity(showIcon ? 1 : 0)
-                    .padding(.bottom, 12)
-                    .onAppear {
-                        withAnimation(.easeOut(duration: 0.6)) {
-                            showIcon = true
+            ScrollView {
+                VStack(spacing: 32) {
+                    Spacer(minLength: 40)
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 44))
+                        .foregroundStyle(.indigo, .orange)
+                        .shadow(color: .indigo.opacity(0.15), radius: 12, x: 0, y: 6)
+                        .scaleEffect(iconScale)
+                        .opacity(showIcon ? 1 : 0)
+                        .padding(.bottom, 12)
+                        .onAppear {
+                            withAnimation(.easeOut(duration: 0.6)) {
+                                showIcon = true
+                            }
+                            withAnimation(.spring(response: 0.8, dampingFraction: 0.6, blendDuration: 0).delay(0.1)) {
+                                iconScale = 1.2
+                            }
                         }
-                        withAnimation(.spring(response: 0.8, dampingFraction: 0.6, blendDuration: 0).delay(0.1)) {
-                            iconScale = 1.2
-                        }
+                    VStack(spacing: 24) {
+                        corpusCard(
+                            title: "Required FIRE Corpus",
+                            value: animatedRequired,
+                            color: .indigo,
+                            delay: 0.3
+                        )
+                        corpusCard(
+                            title: "Projected Corpus at Retirement",
+                            value: animatedProjected,
+                            color: .green,
+                            delay: 0.5
+                        )
                     }
-                VStack(spacing: 24) {
-                    corpusCard(
-                        title: "Required FIRE Corpus",
-                        value: animatedRequired,
-                        color: .indigo,
-                        delay: 0.3
-                    )
-                    corpusCard(
-                        title: "Projected Corpus at Retirement",
-                        value: animatedProjected,
-                        color: .green,
-                        delay: 0.5
-                    )
+                    .padding(.horizontal, 6)
+                    summaryTipSection
+                    if !yearlyData.isEmpty {
+                        YearlyCorpusChart(yearlyData: yearlyData, showCards: $showCards, requiredCorpus: requiredCorpus)
+                            .frame(maxWidth: .infinity)
+                    }
+                    Spacer(minLength: 24)
+                    backButton()
                 }
-                .padding(.horizontal, 6)
-                summaryTipSection
-                Spacer()
-                backButton()
+                .padding([.horizontal, .top], 16)
+                .padding(.bottom, 24)
+                .frame(maxWidth: 600)
+                .navigationTitle("FIRE Results")
             }
-            .padding()
-            .navigationTitle("FIRE Results")
+            .scrollIndicators(.hidden)
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                 withAnimation(.spring(response: 1.5, dampingFraction: 0.8, blendDuration: 0)) {
-                    animatedRequired = requiredCorpus
+                    animatedRequired = fireCalculationResult.requiredCorpus
                 }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 withAnimation(.spring(response: 1.5, dampingFraction: 0.8, blendDuration: 0)) {
-                    animatedProjected = projectedCorpus
+                    animatedProjected = fireCalculationResult.projectedCorpus
                 }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -237,43 +263,23 @@ struct FireResultView: View {
     }
 }
 
-// Enhanced animated number text with sophisticated counter animation
-struct EnhancedAnimatedNumberText: View, Animatable {
-    var value: Double
-    var color: Color
-    var delay: Double
-    @State private var displayedValue: Double = 0
-    @State private var isAnimating: Bool = false
-    
-    var animatableData: Double {
-        get { displayedValue }
-        set { displayedValue = newValue }
-    }
-    
-    var body: some View {
-        Text(displayedValue, format: .currency(code: "INR").precision(.fractionLength(0)))
-            .font(.system(size: 32, weight: .bold, design: .rounded))
-            .foregroundColor(color)
-            .shadow(color: color.opacity(0.15), radius: 4, x: 0, y: 2)
-            .monospacedDigit()
-            .scaleEffect(isAnimating ? 1.02 : 1.0)
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                    withAnimation(.easeInOut(duration: 0.3).delay(delay + 0.5)) {
-                        isAnimating = true
-                    }
-                }
-            }
-            .onChange(of: value) { _, newValue in
-                withAnimation(.spring(response: 1.2, dampingFraction: 0.8, blendDuration: 0)) {
-                    displayedValue = newValue
-                }
-            }
-    }
-}
 
 #Preview {
     NavigationStack {
-        FireResultView(requiredCorpus: 10000000, projectedCorpus: 8500000)
+        FireResultView(
+            fireCalculationResult: FireCalculatorFactory.calculate(monthlyExpense: 500000,
+                                                                   expectedWithdrawalRateFromCorpus: 4,
+                                                                   currentAge: 28,
+                                                                   retirementAge: 50,
+                                                                   currentSavings: 20000000,
+                                                                   monthlySIP: 400000,
+                                                                   expectedSIPIncrease: 5,
+                                                                   expectedReturn: 12,
+                                                                   currentSalary: 0,
+                                                                   expectedSalaryIncrease: 7,
+                                                                   currentPfContribution: 54000,
+                                                                   currentPfBalance: 2100000,
+                                                                   inflationPercent: 6)
+        )
     }
 }

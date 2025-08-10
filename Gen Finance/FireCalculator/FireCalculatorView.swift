@@ -140,7 +140,11 @@ struct FireCalculatorView: View {
             focusedField = nil
         }
         .navigationDestination(isPresented: $showResult) {
-            FireResultView(requiredCorpus: fireCorpus ?? 0, projectedCorpus: projectedCorpus ?? 0)
+            if let fireCalculationResult {
+                FireResultView(fireCalculationResult: fireCalculationResult)
+            } else {
+                Text("Something went wrong...")
+            }
         }
         .hideToolBarWithSwipeToDismiss()
     }
@@ -166,8 +170,7 @@ struct FireCalculatorView: View {
     @StateObject private var keyboard = KeyboardResponder()
     @FocusState private var focusedField: Field?
     @State private var showResult: Bool = false
-    @State private var fireCorpus: Double? = nil
-    @State private var projectedCorpus: Double? = nil
+    @State private var fireCalculationResult: FireCalculationResult? = nil
     
     @State private var expectedMonthlyExpense: String = ""
     @State private var expectedWithdrawalRateFromCorpus: String = "4"
@@ -199,7 +202,7 @@ struct FireCalculatorView: View {
         let currentPfBalance = Double(currentPfBalance) ?? 0
         let inflationPercent = Double(inflationPercent) ?? 0
         
-        let result = FireCalculatorEngine.calculate(
+        fireCalculationResult = FireCalculatorFactory.calculate(
             monthlyExpense: monthlyExpense,
             expectedWithdrawalRateFromCorpus: withdrawalRate,
             currentAge: currentAge,
@@ -214,8 +217,6 @@ struct FireCalculatorView: View {
             currentPfBalance: currentPfBalance,
             inflationPercent: inflationPercent
         )
-        fireCorpus = result.requiredCorpus
-        projectedCorpus = result.projectedCorpus
         showResult = true
     }
 }

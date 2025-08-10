@@ -136,6 +136,14 @@ struct FireCalculatorView: View {
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
         .navigationTitle("FIRE Calculator")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Reset") {
+                    resetToDefaults()
+                }
+                .foregroundColor(.indigo)
+            }
+        }
         .onTapGesture {
             focusedField = nil
         }
@@ -172,19 +180,21 @@ struct FireCalculatorView: View {
     @State private var showResult: Bool = false
     @State private var fireCalculationResult: FireCalculationResult? = nil
     
-    @State private var expectedMonthlyExpense: String = ""
-    @State private var expectedWithdrawalRateFromCorpus: String = "4"
-    @State private var expectedIncInSIPAmount: String = "5"
-    @State private var currentSavings: String = ""
-    @State private var monthlySIP: String = ""
-    @State private var expectedYearlyReturn: String = "15"
-    @State private var currentSalary: String = ""
-    @State private var expectedSalaryIncrease: String = "5"
-    @State private var currentPfContribution: String = ""
-    @State private var currentPfBalance: String = ""
-    @State private var inflationPercent: String = "8"
-    @State private var currentAge: String = "27"
-    @State private var retirementAge: String = "45"
+    // MARK: - AppStorage Properties (Automatic Local Storage)
+    
+    @AppStorage("expectedMonthlyExpense") private var expectedMonthlyExpense: String = ""
+    @AppStorage("expectedWithdrawalRateFromCorpus") private var expectedWithdrawalRateFromCorpus: String = "4"
+    @AppStorage("expectedIncInSIPAmount") private var expectedIncInSIPAmount: String = "5"
+    @AppStorage("currentSavings") private var currentSavings: String = ""
+    @AppStorage("monthlySIP") private var monthlySIP: String = ""
+    @AppStorage("expectedYearlyReturn") private var expectedYearlyReturn: String = "15"
+    @AppStorage("currentSalary") private var currentSalary: String = ""
+    @AppStorage("expectedSalaryIncrease") private var expectedSalaryIncrease: String = "5"
+    @AppStorage("currentPfContribution") private var currentPfContribution: String = ""
+    @AppStorage("currentPfBalance") private var currentPfBalance: String = ""
+    @AppStorage("inflationPercent") private var inflationPercent: String = "8"
+    @AppStorage("currentAge") private var currentAge: String = "27"
+    @AppStorage("retirementAge") private var retirementAge: String = "45"
     
     func calculateFireCorpus() {
         // Parse inputs
@@ -218,6 +228,22 @@ struct FireCalculatorView: View {
             inflationPercent: inflationPercent
         )
         showResult = true
+    }
+    
+    private func resetToDefaults() {
+        expectedMonthlyExpense = ""
+        expectedWithdrawalRateFromCorpus = "4"
+        expectedIncInSIPAmount = "5"
+        currentSavings = ""
+        monthlySIP = ""
+        expectedYearlyReturn = "15"
+        currentSalary = ""
+        expectedSalaryIncrease = "5"
+        currentPfContribution = ""
+        currentPfBalance = ""
+        inflationPercent = "8"
+        currentAge = "27"
+        retirementAge = "45"
     }
 }
 

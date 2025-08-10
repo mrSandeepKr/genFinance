@@ -18,7 +18,7 @@ struct AgeInputSection: View {
         HStack(alignment: .center, spacing: 0) {
             ZStack {
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemGray6).opacity(0.7))
+                    .fill(Color(.systemGray6))
                 SingleAgeInput(
                     title: "Current age",
                     value: $currentAge,
@@ -43,7 +43,7 @@ struct AgeInputSection: View {
 
             ZStack {
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemGray6).opacity(0.7))
+                    .fill(Color(.systemGray6))
                 SingleAgeInput(
                     title: "Retirement age",
                     value: $retirementAge,

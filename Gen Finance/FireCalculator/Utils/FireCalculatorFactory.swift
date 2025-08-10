@@ -161,8 +161,6 @@ struct FireCalculatorFactory {
                 pf: pfBalance
             ))
         }
-        
-        print(yearlyData)
         return yearlyData
     }
 

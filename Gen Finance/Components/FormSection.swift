@@ -8,15 +8,26 @@
 import Foundation
 import SwiftUI
 
-struct FormSection<Content: View>: View {
+struct FormSection<Content: View, Value: Equatable>: View {
     let heading: String
     let symbol: String?
     let content: Content
+    let animationValue: Value?
+    let isResetting: Bool
+    let animationDelay: Double
     
-    init(heading: String, symbol: String? = nil, @ViewBuilder content: () -> Content) {
+    init(heading: String, 
+         symbol: String? = nil, 
+         animationValue: Value? = nil,
+         isResetting: Bool = false,
+         animationDelay: Double = 0.0,
+         @ViewBuilder content: () -> Content) {
         self.heading = heading
         self.symbol = symbol
         self.content = content()
+        self.animationValue = animationValue
+        self.isResetting = isResetting
+        self.animationDelay = animationDelay
     }
     
     var body: some View {
@@ -32,7 +43,7 @@ struct FormSection<Content: View>: View {
                     .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(.indigo.gradient.opacity(0.8))
             }
-            .padding(.top, 12)
+            .padding(.top, 16)
             content
             Spacer(minLength: 10)
         }
@@ -47,7 +58,9 @@ struct FormSection<Content: View>: View {
         .padding(.vertical, 4)
         .padding(.horizontal, 2)
         .transition(.opacity.combined(with: .move(edge: .top)))
-        .animation(.easeOut(duration: 0.5), value: heading)
+        .animation(.easeOut(duration: 0.5).delay(animationDelay), value: animationValue)
+        .scaleEffect(isResetting ? 0.95 : 1.0)
+        .opacity(isResetting ? 0.7 : 1.0)
     }
 }
 

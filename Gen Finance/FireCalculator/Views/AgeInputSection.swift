@@ -1,15 +1,19 @@
 import SwiftUI
 
-struct AgeInputSection: View {
+struct AgeInputSection<T: Hashable>: View {
     
     // MARK: - Init
     
     init(currentAge: Binding<String>,
          retirementAge:  Binding<String>,
-         focusedField: FocusState<FireCalculatorView.Field?>.Binding) {
+         focusedField: FocusState<T?>.Binding,
+         currentAgeField: T,
+         retirementAgeField: T) {
         self._currentAge = currentAge
         self._retirementAge = retirementAge
         self.focusedField = focusedField
+        self.currentAgeField = currentAgeField
+        self.retirementAgeField = retirementAgeField
     }
     
     // MARK: - View
@@ -25,7 +29,7 @@ struct AgeInputSection: View {
                     placeholder: "25",
                     min: 0,
                     max: 99,
-                    field: .currentAge,
+                    field: currentAgeField,
                     focusedField: focusedField
                 )
                 .padding(.vertical, 8)
@@ -50,7 +54,7 @@ struct AgeInputSection: View {
                     placeholder: "55",
                     min: 0,
                     max: 100,
-                    field: .retirementAge,
+                    field: retirementAgeField,
                     focusedField: focusedField
                 )
                 .padding(.vertical, 8)
@@ -62,14 +66,16 @@ struct AgeInputSection: View {
         .padding(.horizontal)
     }
     
-    // MARK: - Init
+    // MARK: - Private
     
     @Binding private var currentAge: String
     @Binding private var retirementAge: String
-    private var focusedField: FocusState<FireCalculatorView.Field?>.Binding
+    private var focusedField: FocusState<T?>.Binding
+    private var currentAgeField: T
+    private var retirementAgeField: T
 }
 
-struct SingleAgeInput: View {
+struct SingleAgeInput<T: Hashable>: View {
     
     // MARK: - Init
     
@@ -78,8 +84,8 @@ struct SingleAgeInput: View {
          placeholder: String,
          min: Int,
          max: Int,
-         field: FireCalculatorView.Field,
-         focusedField: FocusState<FireCalculatorView.Field?>.Binding) {
+         field: T,
+         focusedField: FocusState<T?>.Binding) {
         self.title = title
         self._value = value
         self.placeholder = placeholder
@@ -116,8 +122,8 @@ struct SingleAgeInput: View {
     private let placeholder: String
     private let min: Int
     private  let max: Int
-    private  let field: FireCalculatorView.Field
-    private  var focusedField: FocusState<FireCalculatorView.Field?>.Binding
+    private  let field: T
+    private  var focusedField: FocusState<T?>.Binding
     
     private func onChange(_ oldValue: String,_ newValue: String) {
         let filtered = newValue.filter { "0123456789".contains($0) }

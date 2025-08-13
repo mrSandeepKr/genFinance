@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct NumericTextField: View {
+struct NumericTextField<T: Hashable>: View {
     
     // MARK: - Init
     
-    init(placeholder: String, title: String, currentVal: Binding<String>, focusedField: FocusState<FireCalculatorView.Field?>.Binding, field: FireCalculatorView.Field) {
+    init(placeholder: String, title: String, currentVal: Binding<String>, focusedField: FocusState<T?>.Binding, field: T) {
         self.placeholder = placeholder
         self.title = title
         self._currentVal = currentVal
@@ -24,7 +24,6 @@ struct NumericTextField: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            
             Text(title)
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
                 .foregroundColor(Color.primary)
@@ -50,6 +49,10 @@ struct NumericTextField: View {
                 .onChange(of: formattedContent) { _, newValue in
                     onChange(newValue)
                 }
+                .onChange(of: currentVal) { _, newValue in
+                    // Update formatted content when currentVal changes from outside
+                    formattedContent = newValue.formattedInINR
+                }
                 .padding(.init(top: 0, leading: 1, bottom: 0, trailing: 1))
         }
         .padding(.top, 20)
@@ -61,8 +64,8 @@ struct NumericTextField: View {
     private let title: String
     @Binding private var currentVal: String
     @State private var formattedContent: String
-    private var focusedField: FocusState<FireCalculatorView.Field?>.Binding
-    private var field: FireCalculatorView.Field
+    private var focusedField: FocusState<T?>.Binding
+    private var field: T
     
     private func onChange(_ newValue: String) {
         currentVal = newValue.filter { "0123456789".contains($0) }

@@ -1,14 +1,14 @@
 import SwiftUI
 
-struct PercentageInputField: View {
+struct PercentageInputField<T: Hashable>: View {
 
     // MARK: - Init
 
     init(
         value: Binding<String>,
         title: String = "Percentage",
-        focusedField: FocusState<FireCalculatorView.Field?>.Binding,
-        field: FireCalculatorView.Field
+        focusedField: FocusState<T?>.Binding,
+        field: T
     ) {
         self._value = value
         self.title = title
@@ -90,8 +90,8 @@ struct PercentageInputField: View {
 
     @Binding private var value: String
     private let title: String
-    private var focusedField: FocusState<FireCalculatorView.Field?>.Binding
-    private var field: FireCalculatorView.Field?
+    private var focusedField: FocusState<T?>.Binding
+    private var field: T
 
     @State private var textWidth: CGFloat = 40
     

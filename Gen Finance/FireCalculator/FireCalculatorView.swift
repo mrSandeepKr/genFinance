@@ -14,12 +14,18 @@ struct FireCalculatorView: View {
                 .ignoresSafeArea()
             ScrollView {
                 VStack(spacing: 24) {
-                    FormSection(heading: "Preference", symbol: "person.crop.circle") {
-                        AgeInputSection(currentAge: $currentAge,
+                    FormSection(heading: "Preference", 
+                               symbol: "person.crop.circle",
+                               animationValue: currentAge,
+                               isResetting: isResetting,
+                               animationDelay: 0.0) {
+                        AgeInputSection<Field>(currentAge: $currentAge,
                                         retirementAge: $retirementAge,
-                                        focusedField: $focusedField)
+                                        focusedField: $focusedField,
+                                        currentAgeField: .currentAge,
+                                        retirementAgeField: .retirementAge)
                         
-                        NumericTextField(placeholder: "INR",
+                        NumericTextField<Field>(placeholder: "INR",
                                          title: "Expected Monthly expense",
                                          currentVal: $expectedMonthlyExpense,
                                          focusedField: $focusedField,
@@ -30,10 +36,13 @@ struct FireCalculatorView: View {
                             .font(.caption)
                             .offset(y: 5)
                     }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                    .animation(.easeOut(duration: 0.5), value: currentAge)
-                    FormSection(heading: "Current Status", symbol: "banknote") {
-                        NumericTextField(placeholder: "INR",
+                    
+                    FormSection(heading: "Current Status", 
+                               symbol: "banknote",
+                               animationValue: currentSalary,
+                               isResetting: isResetting,
+                               animationDelay: 0.1) {
+                        NumericTextField<Field>(placeholder: "INR",
                                          title: "Current Savings",
                                          currentVal: $currentSavings,
                                          focusedField: $focusedField,
@@ -44,29 +53,32 @@ struct FireCalculatorView: View {
                             .offset(y: 5)
                         
                         
-                        NumericTextField(placeholder: "INR",
+                        NumericTextField<Field>(placeholder: "INR",
                                          title: "Current PF Balance",
                                          currentVal: $currentPfBalance,
                                          focusedField: $focusedField,
                                          field: .currentPfBalance)
                         
                     }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                    .animation(.easeOut(duration: 0.5).delay(0.1), value: currentSalary)
-                    FormSection(heading: "Investment Plan", symbol: "chart.line.uptrend.xyaxis") {
+                    
+                    FormSection(heading: "Investment Plan", 
+                               symbol: "chart.line.uptrend.xyaxis",
+                               animationValue: monthlySIP,
+                               isResetting: isResetting,
+                               animationDelay: 0.2) {
                         
-                        NumericTextField(placeholder: "INR",
+                        NumericTextField<Field>(placeholder: "INR",
                                          title: "Monthly SIP Investment",
                                          currentVal: $monthlySIP,
                                          focusedField: $focusedField,
                                          field: .monthlySIP)
                         
-                        PercentageInputField(value: $expectedIncInSIPAmount,
+                        PercentageInputField<Field>(value: $expectedIncInSIPAmount,
                                              title: "Expected increase in SIP",
                                              focusedField: $focusedField,
                                              field: .expectedIncInSIPAmount)
                         
-                        NumericTextField(placeholder: "INR",
+                        NumericTextField<Field>(placeholder: "INR",
                                          title: "PF Monthly Contribution",
                                          currentVal: $currentPfContribution,
                                          focusedField: $focusedField,
@@ -76,29 +88,29 @@ struct FireCalculatorView: View {
                             .font(.caption)
                             .offset(y: 5)
                     }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                    .animation(.easeOut(duration: 0.5).delay(0.2), value: monthlySIP)
 
-                    FormSection(heading: "Assumptions", symbol: "lightbulb") {
-                        PercentageInputField(value: $expectedYearlyReturn,
+                    FormSection(heading: "Assumptions", 
+                               symbol: "lightbulb",
+                               animationValue: inflationPercent,
+                               isResetting: isResetting,
+                               animationDelay: 0.4) {
+                        PercentageInputField<Field>(value: $expectedYearlyReturn,
                                              title: "Expected Yearly Return",
                                              focusedField: $focusedField,
                                              field: .expectedYearlyReturn)
-                        PercentageInputField(value: $inflationPercent,
+                        PercentageInputField<Field>(value: $inflationPercent,
                                              title: "Expected Annual Inflation",
                                              focusedField: $focusedField,
                                              field: .inflationPercent)
-                        PercentageInputField(value: $expectedSalaryIncrease,
+                        PercentageInputField<Field>(value: $expectedSalaryIncrease,
                                              title: "Expected Salary Increase",
                                              focusedField: $focusedField,
                                              field: .expectedSalaryIncrease)
-                        PercentageInputField(value: $expectedWithdrawalRateFromCorpus,
+                        PercentageInputField<Field>(value: $expectedWithdrawalRateFromCorpus,
                                              title: "Expected Withdrawal Rate from corpus",
                                              focusedField: $focusedField,
                                              field: .expectedWithdrawalRateFromCorpus)
                     }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                    .animation(.easeOut(duration: 0.5).delay(0.4), value: inflationPercent)
                 }
                 .padding(.horizontal, 15)
                 .padding(.top, 20)
@@ -139,9 +151,19 @@ struct FireCalculatorView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Reset") {
-                    resetToDefaults()
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                    impactFeedback.impactOccurred()
+                    
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isResetting = true
+                        resetToDefaults()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        isResetting = false
+                    }
                 }
                 .foregroundColor(.indigo)
+                .font(.system(size: 16, weight: .medium))
             }
         }
         .onTapGesture {
@@ -179,6 +201,7 @@ struct FireCalculatorView: View {
     @FocusState private var focusedField: Field?
     @State private var showResult: Bool = false
     @State private var fireCalculationResult: FireCalculationResult? = nil
+    @State private var isResetting: Bool = false
     
     // MARK: - AppStorage Properties (Automatic Local Storage)
     
@@ -231,6 +254,8 @@ struct FireCalculatorView: View {
     }
     
     private func resetToDefaults() {
+        focusedField = nil
+        
         expectedMonthlyExpense = ""
         expectedWithdrawalRateFromCorpus = "4"
         expectedIncInSIPAmount = "5"

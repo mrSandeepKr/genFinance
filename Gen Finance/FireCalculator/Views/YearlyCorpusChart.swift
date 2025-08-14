@@ -18,8 +18,6 @@ struct YearlyCorpusChart: View {
     @StateObject private var animationManager = AnimationManager()
     
     var body: some View {
-        
-        
         BarChartContent(
             yearlyData: yearlyData,
             animatedBars: animationManager.animatedBars,
@@ -35,6 +33,10 @@ struct YearlyCorpusChart: View {
                 animationManager.resetAnimation()
             }
         }
+        .opacity(showCards ? 1 : 0)
+        .offset(y: showCards ? 0 : 40)
+        .scaleEffect(showCards ? 1 : 0.95)
+        .animation(.spring(response: 0.7, dampingFraction: 0.8).delay(0.3), value: showCards)
     }
 }
 

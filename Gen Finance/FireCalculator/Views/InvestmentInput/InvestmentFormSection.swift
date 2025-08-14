@@ -44,12 +44,16 @@ struct InvestmentFormSection: View {
          focusedField: FocusState<T?>.Binding,
          isResetting: Binding<Bool>,
          animationDelay: Double,
-         onDelete: @escaping () -> Void) {
+         onDelete: @escaping () -> Void,
+         animatingCards: Binding<Set<UUID>>,
+         removingCards: Binding<Set<UUID>>) {
         self._investment = investment
         self.focusedField = focusedField
         self._isResetting = isResetting
         self.animationDelay = animationDelay
         self.onDelete = onDelete
+        self._animatingCards = animatingCards
+        self._removingCards = removingCards
     }
     
     // MARK: - Private
@@ -61,6 +65,8 @@ struct InvestmentFormSection: View {
     @Binding var isResetting: Bool
     private let animationDelay: Double
     private let onDelete: () -> Void
+    @Binding private var animatingCards: Set<UUID>
+    @Binding private var removingCards: Set<UUID>
     
     @ViewBuilder
     private func content() -> some View {
@@ -109,6 +115,22 @@ struct InvestmentFormSection: View {
             }
             .buttonStyle(PlainButtonStyle())
         }
+        .scaleEffect(animatingCards.contains(investment.uuid) ? 1.02 : 1.0)
+        .opacity(removingCards.contains(investment.uuid) ? 0 : 1)
+        .offset(y: removingCards.contains(investment.uuid) ? -15 : 0)
+        .animation(.easeInOut(duration: 0.3), value: removingCards.contains(investment.uuid))
+        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: animatingCards.contains(investment.uuid))
+    }
+    
+    private var cardTransition: AnyTransition {
+        .asymmetric(
+            insertion: .scale(scale: 0.8)
+                .combined(with: .opacity)
+                .combined(with: .offset(y: 30)),
+            removal: .scale(scale: 0.9)
+                .combined(with: .opacity)
+                .combined(with: .offset(y: -30))
+        )
     }
 }
 

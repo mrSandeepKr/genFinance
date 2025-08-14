@@ -43,7 +43,9 @@ struct FireResultView: View {
                     .padding(.horizontal, 6)
                     summaryTipSection
                     if !yearlyData.isEmpty {
-                        YearlyCorpusChart(yearlyData: yearlyData, showCards: $showCards, requiredCorpus: requiredCorpus)
+                        YearlyCorpusChart(yearlyData: yearlyData,
+                                          showCards: $showCards,
+                                          requiredCorpus: requiredCorpus)
                             .frame(maxWidth: .infinity)
                     }
                     

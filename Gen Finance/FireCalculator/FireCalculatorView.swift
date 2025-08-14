@@ -35,62 +35,12 @@ struct FireCalculatorView: View {
                             .foregroundStyle(.secondary)
                             .font(.caption)
                             .offset(y: 5)
-                    }
-                    
-                    FormSection(heading: "Current Status", 
-                               symbol: "banknote",
-                               animationValue: currentSalary,
-                               isResetting: isResetting,
-                               animationDelay: 0.1) {
-                        NumericTextField<Field>(placeholder: "INR",
-                                         title: "Current Savings",
-                                         currentVal: $currentSavings,
-                                         focusedField: $focusedField,
-                                         field: .currentSavings)
-                        Text("Include all the savings that you have, such as fixed deposits, mutual funds, etc.")
-                            .foregroundStyle(.secondary)
-                            .font(.caption)
-                            .offset(y: 5)
                         
-                        
-                    }
-                    
-                    FormSection(heading: "Investment Plan", 
-                               symbol: "chart.line.uptrend.xyaxis",
-                               animationValue: monthlySIP,
-                               isResetting: isResetting,
-                               animationDelay: 0.2) {
-                        
-                        NumericTextField<Field>(placeholder: "INR",
-                                         title: "Monthly SIP Investment",
-                                         currentVal: $monthlySIP,
-                                         focusedField: $focusedField,
-                                         field: .monthlySIP)
-                        
-                        PercentageInputField<Field>(value: $expectedIncInSIPAmount,
-                                             title: "Expected increase in SIP",
-                                             focusedField: $focusedField,
-                                             field: .expectedIncInSIPAmount)
-                        
-                    }
-
-                    FormSection(heading: "Assumptions", 
-                               symbol: "lightbulb",
-                               animationValue: inflationPercent,
-                               isResetting: isResetting,
-                               animationDelay: 0.4) {
-                        PercentageInputField<Field>(value: $expectedYearlyReturn,
-                                             title: "Expected Yearly Return",
-                                             focusedField: $focusedField,
-                                             field: .expectedYearlyReturn)
                         PercentageInputField<Field>(value: $inflationPercent,
                                              title: "Expected Annual Inflation",
                                              focusedField: $focusedField,
                                              field: .inflationPercent)
-                        PercentageInputField<Field>(value: $expectedSalaryIncrease,
-                                             title: "Expected Salary Increase",
-                                             focusedField: $focusedField,
-                                             field: .expectedSalaryIncrease)
+                        
                         PercentageInputField<Field>(value: $expectedWithdrawalRateFromCorpus,
                                              title: "Expected Withdrawal Rate from corpus",
                                              focusedField: $focusedField,

@@ -58,16 +58,16 @@ struct FireCalculatorView: View {
                     Button(action: addInvestment) {
                         HStack {
                             Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.indigo)
+                                .foregroundColor(theme.primary)
                             Text("Add Investment")
-                                .foregroundColor(.indigo)
+                                .foregroundColor(theme.primary)
                                 .font(.system(size: 16, weight: .medium))
                         }
                         .padding(.vertical, 12)
                         .padding(.horizontal, 20)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.indigo.opacity(0.3), lineWidth: 1.5)
+                                .stroke(theme.primary.opacity(0.3), lineWidth: 1.5)
                         )
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -86,25 +86,28 @@ struct FireCalculatorView: View {
                     }
                 }) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.indigo.gradient.opacity(0.7))
-                            .frame(height: 56)
-                            .overlay(
-                                LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.35), Color.clear]), startPoint: .top, endPoint: .bottom)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                            )
-                            .shadow(color: Color.indigo.opacity(0.18), radius: 8, x: 0, y: 4)
-                        Text("Calculate FIRE Corpus")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.white)
-                            .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
-                    }
+						RoundedRectangle(cornerRadius: 12)
+							.fill(theme.primary.gradient.opacity(0.7))
+							.frame(height: 56)
+							.overlay(
+								LinearGradient(gradient: Gradient(colors: [theme.contentPrimary.opacity(0.35), Color.clear]), startPoint: .top, endPoint: .bottom)
+									.clipShape(RoundedRectangle(cornerRadius: 12))
+							)
+							.shadow(color: theme.primary200, radius: 8, x: 0, y: 4)
+						Text("Calculate FIRE Corpus")
+							.font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(theme.alwaysLight)
+							.shadow(color: theme.shadow, radius: 2, x: 0, y: 1)
+					}
                     .scaleEffect(showResult ? 1.05 : 1.0)
                     .animation(.easeInOut(duration: 0.2), value: showResult)
                 }
                 .padding(.init(top: 16, leading: 12, bottom: 8, trailing: 12))
                 .background(
-                    Color(.systemBackground).edgesIgnoringSafeArea(.bottom).shadow(radius: 8)
+                    theme
+                        .secondarySystemBackground
+                        .edgesIgnoringSafeArea(.bottom)
+                        .shadow(radius: 8)
                 )
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -124,7 +127,7 @@ struct FireCalculatorView: View {
                         isResetting = false
                     }
                 }
-                .foregroundColor(.indigo)
+                .foregroundColor(theme.primary)
                 .font(.system(size: 16, weight: .medium))
             }
         }
@@ -161,6 +164,7 @@ struct FireCalculatorView: View {
     }
     
     // MARK: - Private
+    @Environment(\.appTheme) private var theme
     
     @StateObject private var keyboard = KeyboardResponder()
     @FocusState private var focusedField: Field?

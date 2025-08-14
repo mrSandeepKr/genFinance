@@ -27,6 +27,7 @@ struct Gen_FinanceApp: App {
             ZStack {
                 ContentView()
             }
+            .appTheme(PrimaryTheme())
         }
         .modelContainer(sharedModelContainer)
     }

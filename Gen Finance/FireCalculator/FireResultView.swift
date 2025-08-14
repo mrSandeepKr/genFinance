@@ -3,28 +3,6 @@ import Charts
 
 struct FireResultView: View {
     
-    // MARK: - Private
-    
-    let fireCalculationResult: FireCalculationResult
-    @Environment(\.dismiss) var dismiss
-    @State private var animatedRequired: Double = 0
-    @State private var animatedProjected: Double = 0
-    @State private var showCards: Bool = false
-    @State private var showIcon: Bool = false
-    @State private var iconScale: CGFloat = 0.5
-    
-    private var projectedCorpus: Double {
-        fireCalculationResult.projectedCorpus
-    }
-    
-    private var requiredCorpus: Double {
-        fireCalculationResult.requiredCorpus
-    }
-    
-    private var yearlyData: [YearlyCorpusPoint] {
-        fireCalculationResult.yearlyData
-    }
-    
     // MARK: - View
     
     var body: some View {
@@ -36,7 +14,7 @@ struct FireResultView: View {
                     Image(systemName: "flame.fill")
                         .font(.system(size: 44))
                         .foregroundStyle(.indigo, .orange)
-                        .shadow(color: .indigo.opacity(0.15), radius: 12, x: 0, y: 6)
+                        .shadow(color: theme.primary150, radius: 12, x: 0, y: 6)
                         .scaleEffect(iconScale)
                         .opacity(showIcon ? 1 : 0)
                         .padding(.bottom, 12)
@@ -68,6 +46,7 @@ struct FireResultView: View {
                         YearlyCorpusChart(yearlyData: yearlyData, showCards: $showCards, requiredCorpus: requiredCorpus)
                             .frame(maxWidth: .infinity)
                     }
+                    
                     Spacer(minLength: 24)
                     backButton()
                 }
@@ -94,6 +73,29 @@ struct FireResultView: View {
             }
         }
         .hideNavBarWithSiwpeToDismiss()
+    }
+    
+    // MARK: - Private
+    @Environment(\.appTheme) private var theme
+    
+    let fireCalculationResult: FireCalculationResult
+    @Environment(\.dismiss) var dismiss
+    @State private var animatedRequired: Double = 0
+    @State private var animatedProjected: Double = 0
+    @State private var showCards: Bool = false
+    @State private var showIcon: Bool = false
+    @State private var iconScale: CGFloat = 0.5
+    
+    private var projectedCorpus: Double {
+        fireCalculationResult.projectedCorpus
+    }
+    
+    private var requiredCorpus: Double {
+        fireCalculationResult.requiredCorpus
+    }
+    
+    private var yearlyData: [YearlyCorpusPoint] {
+        fireCalculationResult.yearlyData
     }
     
     @ViewBuilder
@@ -123,7 +125,7 @@ struct FireResultView: View {
         VStack(spacing: 14) {
             Text(title)
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(.secondary)
+                .foregroundColor(theme.contentSecondary)
                 .multilineTextAlignment(.center)
             
             EnhancedAnimatedNumberText(value: value, color: color, delay: delay)
@@ -135,7 +137,7 @@ struct FireResultView: View {
                 VisualEffectBlur(blurStyle: .systemMaterial)
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        Color.white.opacity(0.1),
+                        theme.alwaysLight.opacity(0.1),
                         Color.clear
                     ]),
                     startPoint: .top,
@@ -146,7 +148,7 @@ struct FireResultView: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .shadow(color: color.opacity(0.1), radius: 15, x: 0, y: 8)
-        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .shadow(color: theme.shadow, radius: 4, x: 0, y: 2)
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(
@@ -174,7 +176,7 @@ struct FireResultView: View {
             if requiredCorpus == 0 || projectedCorpus == 0 {
                 return ("info.circle.fill", "Enter your details to see your FIRE status.", .gray)
             } else if gap >= 0 {
-                return ("checkmark.seal.fill", "You are on track for FIRE!", .green)
+                return ("checkmark.seal.fill", "You are on track for FIRE!", theme.positive)
             } else {
                 return ("exclamationmark.triangle.fill", "Consider increasing your SIP or retirement age to close the gap.", .orange)
             }
@@ -188,7 +190,7 @@ struct FireResultView: View {
             
             Text(message)
                 .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.primary)
+                .foregroundColor(theme.primary)
                 .multilineTextAlignment(.leading)
         }
         .padding(.top, 24)
@@ -247,12 +249,12 @@ struct FireResultView: View {
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(Color.white.opacity(0.2), lineWidth: 1)
                     )
-                    .shadow(color: Color.indigo.opacity(0.25), radius: 12, x: 0, y: 6)
+                    .shadow(color: theme.primary250, radius: 12, x: 0, y: 6)
                 
                 Text("Okay")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
-                    .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
+                    .foregroundColor(theme.alwaysLight)
+                    .shadow(color: theme.shadow, radius: 2, x: 0, y: 1)
             }
         }
         .scaleEffect(showCards ? 1 : 0.9)

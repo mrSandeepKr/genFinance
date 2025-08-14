@@ -9,26 +9,8 @@ import Foundation
 import SwiftUI
 
 struct FormSection<Content: View, Value: Equatable>: View {
-    let heading: String
-    let symbol: String?
-    let content: Content
-    let animationValue: Value?
-    let isResetting: Bool
-    let animationDelay: Double
     
-    init(heading: String, 
-         symbol: String? = nil, 
-         animationValue: Value? = nil,
-         isResetting: Bool = false,
-         animationDelay: Double = 0.0,
-         @ViewBuilder content: () -> Content) {
-        self.heading = heading
-        self.symbol = symbol
-        self.content = content()
-        self.animationValue = animationValue
-        self.isResetting = isResetting
-        self.animationDelay = animationDelay
-    }
+    // MARK: - View
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -37,7 +19,7 @@ struct FormSection<Content: View, Value: Equatable>: View {
                     Image(systemName: symbol)
                         .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(.indigo.gradient.opacity(0.85))
-                        .shadow(color: .indigo.opacity(0.08), radius: 2, x: 0, y: 1)
+                        .shadow(color: theme.primary080, radius: 2, x: 0, y: 1)
                 }
                 Text(heading)
                     .font(.system(size: 22, weight: .semibold))
@@ -54,7 +36,7 @@ struct FormSection<Content: View, Value: Equatable>: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         )
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .shadow(color: Color.indigo.opacity(0.08), radius: 8, x: 0, y: 4)
+        .shadow(color: theme.primary080, radius: 8, x: 0, y: 4)
         .padding(.vertical, 4)
         .padding(.horizontal, 2)
         .transition(.opacity.combined(with: .move(edge: .top)))
@@ -62,6 +44,33 @@ struct FormSection<Content: View, Value: Equatable>: View {
         .scaleEffect(isResetting ? 0.95 : 1.0)
         .opacity(isResetting ? 0.7 : 1.0)
     }
+    
+    // MARK: - Init
+
+    init(heading: String,
+         symbol: String? = nil,
+         animationValue: Value? = nil,
+         isResetting: Bool = false,
+         animationDelay: Double = 0.0,
+         @ViewBuilder content: () -> Content) {
+        self.heading = heading
+        self.symbol = symbol
+        self.content = content()
+        self.animationValue = animationValue
+        self.isResetting = isResetting
+        self.animationDelay = animationDelay
+    }
+    
+    // MARK: - Private
+    
+    @Environment(\.appTheme) private var theme
+    
+    private let heading: String
+    private let symbol: String?
+    private let content: Content
+    private let animationValue: Value?
+    private let isResetting: Bool
+    private let animationDelay: Double
 }
 
 #Preview {

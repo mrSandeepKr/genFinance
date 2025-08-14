@@ -30,7 +30,7 @@ struct NumericTextField<T: Hashable>: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundColor(Color.primary)
+                .foregroundColor(theme.contentPrimary)
             
             TextField(placeholder, text: $formattedContent)
                 .focused(focusedField, equals: field)
@@ -48,7 +48,7 @@ struct NumericTextField<T: Hashable>: View {
                         .stroke( Color.indigo.opacity(0.2), lineWidth: 1.5)
                         .animation(.easeInOut(duration: 0.2), value: focusedField.wrappedValue == field)
                 )                .keyboardType(.numberPad)
-                .shadow(color: focusedField.wrappedValue == field ? Color.indigo.opacity(0.1) : Color.black.opacity(0.07),
+                .shadow(color: focusedField.wrappedValue == field ? theme.primary100 : theme.shadow,
                         radius: focusedField.wrappedValue == field ? 6 : 3, x: 0, y: 2)
                 .onChange(of: formattedContent) { _, newValue in
                     onChange(newValue)
@@ -64,6 +64,8 @@ struct NumericTextField<T: Hashable>: View {
     
     // MARK: - Private
     
+    @Environment(\.appTheme) private var theme
+
     private let placeholder: String
     private let title: String
     @Binding private var currentVal: String

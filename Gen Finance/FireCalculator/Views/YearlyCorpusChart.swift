@@ -18,26 +18,15 @@ struct YearlyCorpusChart: View {
     @StateObject private var animationManager = AnimationManager()
     
     var body: some View {
-        let years = yearlyData.map { $0.year }
+        
         
         BarChartContent(
             yearlyData: yearlyData,
             animatedBars: animationManager.animatedBars,
             requiredCorpus: requiredCorpus,
             showCards: showCards
-        ).chartXAxis {
-            ChartUtils.configureXAxis(yearlyData: yearlyData)
-        }
-        .chartXScale(domain: years.first!...years.last!)
-        .chartYAxis {
-            ChartUtils.configureYAxis()
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
-                .shadow(color: .indigo.opacity(0.07), radius: 8, x: 0, y: 4)
         )
-        .frame(height: 220)
+        .frame(height: 250)
         .padding(.all, 8)
         .onChange(of: showCards) { _, newValue in
             if newValue {
@@ -50,18 +39,37 @@ struct YearlyCorpusChart: View {
 }
 
 struct BarChartContent: View {
+    @Environment(\.appTheme) private var theme
     let yearlyData: [YearlyCorpusPoint]
     let animatedBars: [Int]
     let requiredCorpus: Double
     let showCards: Bool
     
     var body: some View {
+        let years = yearlyData.map { $0.year }
+        
         Chart {
             ChartUtils.createBarMarks(yearlyData: yearlyData, animatedBars: animatedBars)
             ChartUtils.createRuleMark(requiredCorpus: requiredCorpus)
         }
         .opacity(showCards ? 1 : 0)
         .animation(.easeInOut(duration: 0.8).delay(1.0), value: showCards)
+        .chartXAxis {
+            ChartUtils.configureXAxis(yearlyData: yearlyData)
+        }
+        .chartXScale(domain: years.first!...years.last!)
+        .chartYAxis {
+            ChartUtils.configureYAxis()
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.ultraThinMaterial)
+                .shadow(color: theme.primary080, radius: 8, x: 0, y: 4)
+                .padding(.top, -20)
+                .padding(.bottom, -12)
+                .padding(.trailing, -12)
+                .padding(.leading, -4)
+        )
     }
 }
 

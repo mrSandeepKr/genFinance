@@ -9,11 +9,11 @@ struct InvestmentFormSection: View {
             HStack(spacing: 8) {
                Image(systemName: "chart.line.uptrend.xyaxis")
                     .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(.indigo.gradient.opacity(0.85))
-                    .shadow(color: .indigo.opacity(0.08), radius: 2, x: 0, y: 1)
+                    .foregroundStyle(theme.primary.gradient.opacity(0.85))
+                    .shadow(color: theme.primary080, radius: 2, x: 0, y: 1)
                 TextField("Investment Name", text: $investment.name)
                     .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(.indigo.gradient.opacity(0.8))
+                    .foregroundStyle(theme.primary.gradient.opacity(0.8))
                     .focused(focusedField, equals: .investment(.name(investment.uuid.uuidString)))
             }
             .padding(.top, 16)
@@ -29,7 +29,7 @@ struct InvestmentFormSection: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         )
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .shadow(color: Color.indigo.opacity(0.08), radius: 8, x: 0, y: 4)
+        .shadow(color: theme.primary080, radius: 8, x: 0, y: 4)
         .padding(.vertical, 4)
         .padding(.horizontal, 2)
         .scaleEffect(isResetting ? 0.95 : 1.0)
@@ -53,6 +53,8 @@ struct InvestmentFormSection: View {
     }
     
     // MARK: - Private
+    
+    @Environment(\.appTheme) private var theme
     
     @Binding private var investment: InvestmentFormSectionInput
     private var focusedField: FocusState<T?>.Binding
@@ -94,15 +96,15 @@ struct InvestmentFormSection: View {
             Button(action: onDelete) {
                 HStack {
                     Image(systemName: "trash")
-                        .foregroundColor(.red)
+                        .foregroundColor(theme.negative)
                     Text("Remove Investment")
-                        .foregroundColor(.red)
+                        .foregroundColor(theme.negative)
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 16)
                 .background(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                        .stroke(theme.negative.opacity(0.3), lineWidth: 1)
                 )
             }
             .buttonStyle(PlainButtonStyle())

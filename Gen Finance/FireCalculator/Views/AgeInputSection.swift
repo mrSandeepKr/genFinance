@@ -100,21 +100,24 @@ struct SingleAgeInput<T: Hashable>: View {
     var body: some View {
         VStack(alignment: .center, spacing: 10) {
             TextField(placeholder, text: $value)
+                .tint(theme.primary)
                 .focused(focusedField, equals: field)
                 .keyboardType(.numberPad)
                 .font(.system(size: 50, weight: .bold, design: .monospaced))
-                .foregroundStyle(.white)
+                .foregroundStyle(theme.contentPrimary)
                 .multilineTextAlignment(.center)
                 .onChange(of: value) { oldValue, newValue in
                     onChange(oldValue, newValue)
                 }
             Text(title)
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
-                .foregroundColor(.secondary)
+                .foregroundColor(theme.contentSecondary)
         }
     }
     
     // MARK: - Private
+    
+    @Environment(\.appTheme) private var theme
     
     private let title: String
     @Binding private var value: String

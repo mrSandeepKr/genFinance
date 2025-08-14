@@ -53,12 +53,6 @@ struct FireCalculatorView: View {
                             .offset(y: 5)
                         
                         
-                        NumericTextField<Field>(placeholder: "INR",
-                                         title: "Current PF Balance",
-                                         currentVal: $currentPfBalance,
-                                         focusedField: $focusedField,
-                                         field: .currentPfBalance)
-                        
                     }
                     
                     FormSection(heading: "Investment Plan", 
@@ -78,15 +72,6 @@ struct FireCalculatorView: View {
                                              focusedField: $focusedField,
                                              field: .expectedIncInSIPAmount)
                         
-                        NumericTextField<Field>(placeholder: "INR",
-                                         title: "PF Monthly Contribution",
-                                         currentVal: $currentPfContribution,
-                                         focusedField: $focusedField,
-                                         field: .currentPfContribution)
-                        Text("This will be increased based on \"Expected Salary Increase\" field and interest would be 8.5% p.a. applied monthly")
-                            .foregroundStyle(.secondary)
-                            .font(.caption)
-                            .offset(y: 5)
                     }
 
                     FormSection(heading: "Assumptions", 
@@ -188,8 +173,6 @@ struct FireCalculatorView: View {
         case expectedSalaryIncrease
         case monthlySIP
         case expectedYearlyReturn
-        case currentPfContribution
-        case currentPfBalance
         case inflationPercent
         case currentAge
         case retirementAge
@@ -213,8 +196,6 @@ struct FireCalculatorView: View {
     @AppStorage("expectedYearlyReturn") private var expectedYearlyReturn: String = "15"
     @AppStorage("currentSalary") private var currentSalary: String = ""
     @AppStorage("expectedSalaryIncrease") private var expectedSalaryIncrease: String = "5"
-    @AppStorage("currentPfContribution") private var currentPfContribution: String = ""
-    @AppStorage("currentPfBalance") private var currentPfBalance: String = ""
     @AppStorage("inflationPercent") private var inflationPercent: String = "8"
     @AppStorage("currentAge") private var currentAge: String = "27"
     @AppStorage("retirementAge") private var retirementAge: String = "45"
@@ -231,8 +212,6 @@ struct FireCalculatorView: View {
         let expectedReturn = Double(expectedYearlyReturn) ?? 0
         let currentSalary = Double(currentSalary) ?? 0
         let expectedSalaryIncrease = Double(expectedSalaryIncrease) ?? 0
-        let currentPfContribution = Double(currentPfContribution) ?? 0
-        let currentPfBalance = Double(currentPfBalance) ?? 0
         let inflationPercent = Double(inflationPercent) ?? 0
         
         fireCalculationResult = FireCalculatorFactory.calculate(
@@ -246,8 +225,6 @@ struct FireCalculatorView: View {
             expectedReturn: expectedReturn,
             currentSalary: currentSalary,
             expectedSalaryIncrease: expectedSalaryIncrease,
-            currentPfContribution: currentPfContribution,
-            currentPfBalance: currentPfBalance,
             inflationPercent: inflationPercent
         )
         showResult = true
@@ -264,8 +241,6 @@ struct FireCalculatorView: View {
         expectedYearlyReturn = "15"
         currentSalary = ""
         expectedSalaryIncrease = "5"
-        currentPfContribution = ""
-        currentPfBalance = ""
         inflationPercent = "8"
         currentAge = "27"
         retirementAge = "45"

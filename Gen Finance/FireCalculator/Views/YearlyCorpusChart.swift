@@ -206,8 +206,6 @@ fileprivate struct ChartUtils {
                                                                    expectedReturn: 12,
                                                                    currentSalary: 0,
                                                                    expectedSalaryIncrease: 7,
-                                                                   currentPfContribution: 54000,
-                                                                   currentPfBalance: 2100000,
                                                                    inflationPercent: 6)
         )
     }

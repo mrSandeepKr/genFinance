@@ -12,7 +12,6 @@ struct YearlyCorpusPoint {
     let totalCorpus: Double
     let savings: Double
     let sip: Double
-    let pf: Double
 }
 
 /// Engine to perform FIRE calculations
@@ -28,8 +27,6 @@ struct FireCalculatorFactory {
     ///   - expectedSIPIncrease: Expected annual increase in SIP (percent, e.g. 5 for 5%)
     ///   - expectedReturn: Expected annual return on investments (percent, e.g. 12 for 12%)
     ///   - currentSalary: Current annual salary (Double)
-    ///   - currentPfContribution: Current montly PF contribution (Double)
-    ///   - currentPfBalance: Current PF balance (Double)
     ///   - inflationPercent: Expected annual inflation (percent)
     /// - Returns: FireCalculationResult
     static func calculate(
@@ -43,8 +40,6 @@ struct FireCalculatorFactory {
         expectedReturn: Double,
         currentSalary: Double,
         expectedSalaryIncrease: Double,
-        currentPfContribution: Double,
-        currentPfBalance: Double,
         inflationPercent: Double
     ) -> FireCalculationResult {
         
@@ -78,22 +73,8 @@ struct FireCalculatorFactory {
             yearlySip *= (1.0 + sipIncrease)
         }
         
-        // 2c. Project PF
-        
-        let pfMonthlyRate = pow(1.0 + 0.085, 1.0/12.0) - 1
-        var pfBalance = currentPfBalance
-        var monthlyPfContribution = currentPfContribution
-        
-        for _ in 0..<Int(yearsToRetirement) {
-            for _ in 0..<12 {
-                pfBalance *= (1.0 + pfMonthlyRate)
-                pfBalance += monthlyPfContribution
-            }
-            monthlyPfContribution *= (1 + (expectedSalaryIncrease / 100.00))
-        }
-        
         // 3. Total
-        let projectedCorpus = projectedSavings + sipBalance + pfBalance
+        let projectedCorpus = projectedSavings + sipBalance
         
         return FireCalculationResult(requiredCorpus: requiredCorpus,
                                      projectedCorpus: projectedCorpus,
@@ -107,8 +88,6 @@ struct FireCalculatorFactory {
                                                                         expectedReturn: expectedReturn,
                                                                         currentSalary: currentSalary,
                                                                         expectedSalaryIncrease: expectedSalaryIncrease,
-                                                                        currentPfContribution: currentPfContribution,
-                                                                        currentPfBalance: currentPfBalance,
                                                                         inflationPercent: inflationPercent))
     }
 
@@ -125,19 +104,14 @@ struct FireCalculatorFactory {
         expectedReturn: Double,
         currentSalary: Double,
         expectedSalaryIncrease: Double,
-        currentPfContribution: Double,
-        currentPfBalance: Double,
         inflationPercent: Double
     ) -> [YearlyCorpusPoint] {
         let yearsToRetirement = Int(retirementAge - currentAge)
         let annualReturn = expectedReturn / 100.0
         let sipIncrease = expectedSIPIncrease / 100.0
-        let pfMonthlyRate = pow(1.0 + 0.085, 1.0/12.0) - 1
         var savings = currentSavings
         var sipBalance = 0.0
         var yearlySip = monthlySIP * 12.0
-        var pfBalance = currentPfBalance
-        var monthlyPfContribution = currentPfContribution
         var yearlyData: [YearlyCorpusPoint] = []
         for year in 0..<yearsToRetirement {
             // Grow savings
@@ -146,19 +120,12 @@ struct FireCalculatorFactory {
             sipBalance *= (1.0 + annualReturn)
             sipBalance += yearlySip
             yearlySip *= (1.0 + sipIncrease)
-            // Grow PF
-            for _ in 0..<12 {
-                pfBalance *= (1.0 + pfMonthlyRate)
-                pfBalance += monthlyPfContribution
-            }
-            monthlyPfContribution *= (1 + (expectedSalaryIncrease / 100.00))
-            let total = savings + sipBalance + pfBalance
+            let total = savings + sipBalance
             yearlyData.append(YearlyCorpusPoint(
                 year: year + 1 + currentAge,
                 totalCorpus: total,
                 savings: savings,
-                sip: sipBalance,
-                pf: pfBalance
+                sip: sipBalance
             ))
         }
         return yearlyData

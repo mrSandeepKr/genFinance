@@ -35,17 +35,44 @@ struct FireCalculatorView: View {
                             .foregroundStyle(.secondary)
                             .font(.caption)
                             .offset(y: 5)
-                        
-                        PercentageInputField<Field>(value: $inflationPercent,
-                                             title: "Expected Annual Inflation",
-                                             focusedField: $focusedField,
-                                             field: .inflationPercent)
-                        
+                    }
+                    
+                    FormSection(heading: "Assumptions",
+                               symbol: "lightbulb",
+                               animationValue: inflationPercent,
+                               isResetting: isResetting,
+                               animationDelay: 0.4) {
                         PercentageInputField<Field>(value: $expectedWithdrawalRateFromCorpus,
                                              title: "Expected Withdrawal Rate from corpus",
                                              focusedField: $focusedField,
                                              field: .expectedWithdrawalRateFromCorpus)
+                        PercentageInputField<Field>(value: $inflationPercent,
+                                             title: "Expected Annual Inflation",
+                                             focusedField: $focusedField,
+                                             field: .inflationPercent)
                     }
+                    
+                    investmentsSection()
+                    
+                    // Add Investment Button
+                    Button(action: addInvestment) {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.indigo)
+                            Text("Add Investment")
+                                .foregroundColor(.indigo)
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.indigo.opacity(0.3), lineWidth: 1.5)
+                        )
+                    }
+                    .buttonStyle(PlainButtonStyle())
+
+                    
                 }
                 .padding(.horizontal, 15)
                 .padding(.top, 20)
@@ -114,18 +141,23 @@ struct FireCalculatorView: View {
         .hideToolBarWithSwipeToDismiss()
     }
     
+    // MARK: - Configuration
+
     enum Field: Hashable {
         case expectedMonthlyExpense
         case expectedWithdrawalRateFromCorpus
-        case expectedIncInSIPAmount
-        case currentSavings
-        case currentSalary
-        case expectedSalaryIncrease
-        case monthlySIP
-        case expectedYearlyReturn
         case inflationPercent
         case currentAge
         case retirementAge
+        case investment(InvestmentField)
+    }
+    
+    enum InvestmentField: Hashable {
+        case name(String)
+        case lumpsumAmount(String)
+        case monthlyContribution(String)
+        case expectedReturn(String)
+        case expectedIncrease(String)
     }
     
     // MARK: - Private
@@ -140,41 +172,96 @@ struct FireCalculatorView: View {
     
     @AppStorage("expectedMonthlyExpense") private var expectedMonthlyExpense: String = ""
     @AppStorage("expectedWithdrawalRateFromCorpus") private var expectedWithdrawalRateFromCorpus: String = "4"
-    @AppStorage("expectedIncInSIPAmount") private var expectedIncInSIPAmount: String = "5"
-    @AppStorage("currentSavings") private var currentSavings: String = ""
-    @AppStorage("monthlySIP") private var monthlySIP: String = ""
-    @AppStorage("expectedYearlyReturn") private var expectedYearlyReturn: String = "15"
-    @AppStorage("currentSalary") private var currentSalary: String = ""
-    @AppStorage("expectedSalaryIncrease") private var expectedSalaryIncrease: String = "5"
     @AppStorage("inflationPercent") private var inflationPercent: String = "8"
     @AppStorage("currentAge") private var currentAge: String = "27"
     @AppStorage("retirementAge") private var retirementAge: String = "45"
+    @AppStorage("investmentsData") private var investmentsData: Data = Data()
+	
+	// Computed property to work with investments array
+	private var investments: [InvestmentFormSectionInput] {
+		get {
+			guard let decoded = try? JSONDecoder().decode([InvestmentFormSectionInput].self, from: investmentsData) else {
+				return [
+					InvestmentFormSectionInput(
+						uuid: UUID(),
+						name: "Mutual Funds",
+						lumpsumAmount: "",
+						monthlyContribution: "",
+						expectedReturn: "12",
+						expectedIncrease: "5"
+					)
+				]
+			}
+			return decoded
+		}
+	}
+	
+	// Helper method to update investments
+	private func updateInvestments(_ newInvestments: [InvestmentFormSectionInput]) {
+		if let encoded = try? JSONEncoder().encode(newInvestments) {
+			investmentsData = encoded
+		}
+	}
+    
+    private func addInvestment() {
+		var currentInvestments = investments
+		currentInvestments.append(InvestmentFormSectionInput(
+			uuid: UUID(),
+			name: "Investment \(currentInvestments.count + 1)",
+			lumpsumAmount: "",
+			monthlyContribution: "",
+			expectedReturn: "12",
+			expectedIncrease: "5"
+		))
+		updateInvestments(currentInvestments)
+	}
+    
+    private func removeInvestment(_ uuid: UUID) {
+        var currentInvestments = investments
+        currentInvestments.removeAll { $0.uuid == uuid }
+        updateInvestments(currentInvestments)
+    }
+    
+    @ViewBuilder
+    private func investmentsSection() -> some View {
+        ForEach(investments, id: \.uuid) { investment in
+            InvestmentFormSection(
+                investment: Binding(
+                    get: { 
+                        investments.first { $0.uuid == investment.uuid } ?? investment
+                    },
+                    set: { newValue in
+                        var currentInvestments = investments
+                        if let index = currentInvestments.firstIndex(where: { $0.uuid == investment.uuid }) {
+                            currentInvestments[index] = newValue
+                            updateInvestments(currentInvestments)
+                        }
+                    }
+                ),
+                focusedField: $focusedField,
+                isResetting: $isResetting,
+                animationDelay: Double(0.1) * Double(investments.firstIndex(where: { $0.uuid == investment.uuid }) ?? 0),
+                onDelete: {
+                    removeInvestment(investment.uuid)
+                }
+            )
+        }
+    }
     
     func calculateFireCorpus() {
-        // Parse inputs
         let monthlyExpense = Double(expectedMonthlyExpense) ?? 0
         let withdrawalRate = Double(expectedWithdrawalRateFromCorpus) ?? 0
         let currentAge = Int(currentAge) ?? 0
         let retirementAge = Int(retirementAge) ?? 0
-        let currentSavings = Double(currentSavings) ?? 0
-        let monthlySIP = Double(monthlySIP) ?? 0
-        let expectedSIPIncrease = Double(expectedIncInSIPAmount) ?? 0
-        let expectedReturn = Double(expectedYearlyReturn) ?? 0
-        let currentSalary = Double(currentSalary) ?? 0
-        let expectedSalaryIncrease = Double(expectedSalaryIncrease) ?? 0
         let inflationPercent = Double(inflationPercent) ?? 0
+        let investmentObjects = investments.compactMap { $0.toInvestment() }
         
         fireCalculationResult = FireCalculatorFactory.calculate(
             monthlyExpense: monthlyExpense,
             expectedWithdrawalRateFromCorpus: withdrawalRate,
             currentAge: currentAge,
             retirementAge: retirementAge,
-            currentSavings: currentSavings,
-            monthlySIP: monthlySIP,
-            expectedSIPIncrease: expectedSIPIncrease,
-            expectedReturn: expectedReturn,
-            currentSalary: currentSalary,
-            expectedSalaryIncrease: expectedSalaryIncrease,
+            investments: investmentObjects,
             inflationPercent: inflationPercent
         )
         showResult = true
@@ -185,15 +272,10 @@ struct FireCalculatorView: View {
         
         expectedMonthlyExpense = ""
         expectedWithdrawalRateFromCorpus = "4"
-        expectedIncInSIPAmount = "5"
-        currentSavings = ""
-        monthlySIP = ""
-        expectedYearlyReturn = "15"
-        currentSalary = ""
-        expectedSalaryIncrease = "5"
         inflationPercent = "8"
         currentAge = "27"
         retirementAge = "45"
+        updateInvestments([])
     }
 }
 

@@ -271,12 +271,10 @@ struct FireResultView: View {
                                                                    expectedWithdrawalRateFromCorpus: 4,
                                                                    currentAge: 28,
                                                                    retirementAge: 50,
-                                                                   currentSavings: 20000000,
-                                                                   monthlySIP: 400000,
-                                                                   expectedSIPIncrease: 5,
-                                                                   expectedReturn: 12,
-                                                                   currentSalary: 0,
-                                                                   expectedSalaryIncrease: 7,
+                                                                   investments: [
+                                                                       Investment(name: "Mutual Funds", lumpsumAmount: 20000000, monthlyContribution: 400000, expectedReturn: 12, expectedIncrease: 5),
+                                                                       Investment(name: "Fixed Deposits", lumpsumAmount: 5000000, monthlyContribution: 100000, expectedReturn: 8, expectedIncrease: 3)
+                                                                   ],
                                                                    inflationPercent: 6)
         )
     }

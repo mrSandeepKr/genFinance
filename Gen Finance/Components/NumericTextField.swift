@@ -11,7 +11,11 @@ struct NumericTextField<T: Hashable>: View {
     
     // MARK: - Init
     
-    init(placeholder: String, title: String, currentVal: Binding<String>, focusedField: FocusState<T?>.Binding, field: T) {
+    init(placeholder: String,
+         title: String,
+         currentVal: Binding<String>,
+         focusedField: FocusState<T?>.Binding,
+         field: T) {
         self.placeholder = placeholder
         self.title = title
         self._currentVal = currentVal

@@ -11,6 +11,9 @@ import SwiftData
 @main
 struct Gen_FinanceApp: App {
     
+    @State private var isActive = false
+    private let SPLASH_DURATION: Double = 1.2
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -25,10 +28,22 @@ struct Gen_FinanceApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                ContentView()
+                if isActive {
+                    ContentView()
+                } else {
+                    SplashScreen(duration: SPLASH_DURATION)
+                }
             }
             .appTheme(PrimaryTheme())
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + SPLASH_DURATION) {
+                    withAnimation {
+                        self.isActive = true
+                    }
+                }
+            }
         }
         .modelContainer(sharedModelContainer)
+        
     }
 }

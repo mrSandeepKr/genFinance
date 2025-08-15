@@ -21,12 +21,12 @@ struct FireCalculatorView: View {
     
     private var mainContentView: some View {
         ScrollViewReader { proxy in
-            ZStack {
-                ScrollView {
-                    formContentView(proxy: proxy)
-                }
-                bottomButtonView
+            ScrollView {
+                formContentView(proxy: proxy)
             }
+        }
+        .safeAreaInset(edge: .bottom) {
+            bottomButtonView
         }
         .navigationTitle("FIRE Calculator")
         .toolbar {
@@ -51,7 +51,7 @@ struct FireCalculatorView: View {
         }
         .padding(.horizontal, 15)
         .padding(.top, 20)
-        .padding(.bottom, keyboard.isKeyboardVisible ? 0 : 80)
+       // .padding(.bottom, keyboard.isKeyboardVisible ? 0 : 80)
         .onChange(of: scrollToBottomTick) { _, _ in
             scrollToBottom(proxy: proxy)
         }
@@ -59,7 +59,7 @@ struct FireCalculatorView: View {
     
     private var bottomButtonView: some View {
         VStack {
-            Spacer()
+            //Spacer()
             Button(action: {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                     calculateFireCorpus()
@@ -75,7 +75,8 @@ struct FireCalculatorView: View {
                     .shadow(radius: 8)
             )
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .offset(y: keyboard.isKeyboardVisible ? 200 : 0)
+        .animation(.easeIn(duration: 0.3).delay(0.5), value: keyboard.isKeyboardVisible)
     }
     
     private var calculateButton: some View {
